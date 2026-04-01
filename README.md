@@ -41,8 +41,7 @@ README.md
 ## Клонирование проекта с GitHub
 
 ```bash
-git clone https://github.com/HawHack/IDE-AI.git
-cd IDE-AI/collaborative-ide
+git clone https://github.com/HawHack/collaborative-ide
 
 Если у тебя проект лежит уже локально — просто перейди в папку, где находится docker-compose.yml.
 
