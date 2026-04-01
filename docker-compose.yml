@@ -133,7 +133,7 @@ services:
       timeout: 5s
       retries: 20
 
-    frontend:
+  frontend:
     build:
       context: ./frontend
     env_file:
@@ -148,12 +148,6 @@ services:
       sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173 --strictPort"
     ports:
       - "5173:5173"
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:5173/ || exit 1"]
-      interval: 15s
-      timeout: 5s
-      retries: 20
-      start_period: 90s
 
   nginx:
     image: nginx:1.27-alpine
