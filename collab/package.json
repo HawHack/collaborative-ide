@@ -1,0 +1,27 @@
+{
+  "name": "collaborative-ide-collab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@hocuspocus/extension-database": "3.4.4",
+    "@hocuspocus/extension-logger": "3.4.4",
+    "@hocuspocus/extension-redis": "3.4.4",
+    "@hocuspocus/server": "3.4.4",
+    "jsonwebtoken": "9.0.2",
+    "pg": "8.16.3",
+    "yjs": "13.6.27"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "9.0.10",
+    "@types/node": "25.5.0",
+    "@types/pg": "8.15.5",
+    "tsx": "4.20.5",
+    "typescript": "5.9.2"
+  }
+}

@@ -1,0 +1,174 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-collab_ide}
+      POSTGRES_USER: ${POSTGRES_USER:-collab_ide}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-collab_ide}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-collab_ide} -d ${POSTGRES_DB:-collab_ide}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  executor:
+    build:
+      context: ./executor
+    environment:
+      EXECUTOR_PORT: ${EXECUTOR_PORT:-8010}
+      EXECUTOR_SHARED_TOKEN: ${EXECUTOR_SHARED_TOKEN:-change-me-executor-token}
+      EXECUTOR_TIMEOUT_SECONDS: ${EXECUTOR_TIMEOUT_SECONDS:-10}
+      EXECUTOR_MAX_OUTPUT_BYTES: ${EXECUTOR_MAX_OUTPUT_BYTES:-24000}
+    volumes:
+      - ./executor:/app
+    command: >
+      sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8010 --reload"
+    ports:
+      - "8010:8010"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8010/health', timeout=3).read()"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      BACKEND_PORT: ${BACKEND_PORT:-8000}
+      BACKEND_CORS_ORIGINS: ${BACKEND_CORS_ORIGINS:-http://localhost:5173,http://localhost}
+      BACKEND_PUBLIC_URL: ${BACKEND_PUBLIC_URL:-http://localhost}
+      SQLALCHEMY_DATABASE_URI: ${SQLALCHEMY_DATABASE_URI:-postgresql+psycopg://collab_ide:collab_ide@postgres:5432/collab_ide}
+      ASYNC_SQLALCHEMY_DATABASE_URI: ${ASYNC_SQLALCHEMY_DATABASE_URI:-postgresql+asyncpg://collab_ide:collab_ide@postgres:5432/collab_ide}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-me-access-secret}
+      JWT_REFRESH_SECRET_KEY: ${JWT_REFRESH_SECRET_KEY:-change-me-refresh-secret}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-15}
+      REFRESH_TOKEN_EXPIRE_DAYS: ${REFRESH_TOKEN_EXPIRE_DAYS:-7}
+      SECURE_COOKIES: ${SECURE_COOKIES:-false}
+      EXECUTOR_URL: ${EXECUTOR_URL:-http://executor:8010}
+      EXECUTOR_SHARED_TOKEN: ${EXECUTOR_SHARED_TOKEN:-change-me-executor-token}
+      COLLAB_URL: ${COLLAB_URL:-ws://localhost/ws/collab}
+      COLLAB_INTERNAL_URL: ${COLLAB_INTERNAL_URL:-ws://collab:3001}
+      AI_PROVIDER: ${AI_PROVIDER:-openai_compatible}
+      AI_API_BASE_URL: ${AI_API_BASE_URL:-https://api.openai.com/v1}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_MODEL: ${AI_MODEL:-gpt-4.1-mini}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      executor:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3).read()"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  collab:
+    build:
+      context: ./collab
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_DB: ${POSTGRES_DB:-collab_ide}
+      POSTGRES_USER: ${POSTGRES_USER:-collab_ide}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-collab_ide}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-me-access-secret}
+      COLLAB_INTERNAL_URL: ${COLLAB_INTERNAL_URL:-ws://collab:3001}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./collab:/app
+      - /app/node_modules
+    command: >
+      sh -c "npm install && npm run dev"
+    ports:
+      - "3001:3001"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+
+  frontend:
+    build:
+      context: ./frontend
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost/api/v1}
+    depends_on:
+      backend:
+        condition: service_healthy
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: >
+      sh -c "npm run dev -- --host 0.0.0.0 --port 5173 --strictPort"
+    ports:
+      - "5173:5173"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:5173/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 90s
+
+  nginx:
+    image: nginx:1.27-alpine
+    depends_on:
+      backend:
+        condition: service_healthy
+      collab:
+        condition: service_started
+      frontend:
+        condition: service_started
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+volumes:
+  postgres_data:
+  redis_data:
