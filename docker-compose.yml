@@ -104,17 +104,8 @@ services:
   collab:
     build:
       context: ./collab
-    environment:
-      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
-      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-      POSTGRES_DB: ${POSTGRES_DB:-collab_ide}
-      POSTGRES_USER: ${POSTGRES_USER:-collab_ide}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-collab_ide}
-      REDIS_HOST: ${REDIS_HOST:-redis}
-      REDIS_PORT: ${REDIS_PORT:-6379}
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-me-access-secret}
-      COLLAB_INTERNAL_URL: ${COLLAB_INTERNAL_URL:-ws://collab:3001}
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
@@ -127,12 +118,6 @@ services:
       sh -c "npm install && npm run dev"
     ports:
       - "3001:3001"
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3001"]
-      interval: 15s
-      timeout: 5s
-      retries: 20
-
   frontend:
     build:
       context: ./frontend
