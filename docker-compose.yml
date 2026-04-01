@@ -118,6 +118,7 @@ services:
       sh -c "npm install && npm run dev"
     ports:
       - "3001:3001"
+      
   frontend:
     build:
       context: ./frontend
