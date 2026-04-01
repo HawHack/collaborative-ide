@@ -1,51 +1,44 @@
-# Collaborative IDE Platform
+# IDE-AI / Collaborative IDE
 
-Production-minded collaborative IDE platform with FastAPI, PostgreSQL, Redis, React, Monaco, Yjs/Hocuspocus, Dockerized sandbox execution, activity logging, leaderboard scoring and AI review.
+Совместимая с Docker collaborative IDE с:
+- редактором кода в стиле IDE
+- совместным редактированием через Yjs / Hocuspocus
+- запуском кода
+- AI review
+- activity log / leaderboard
+- авторизацией и проектами
 
-## One-command startup
+---
 
-    docker compose up --build
+## Что внутри
 
-Open `http://localhost`.
+Проект состоит из сервисов:
 
-## Optional environment overrides
+- `frontend` — React / Vite интерфейс
+- `backend` — FastAPI API
+- `collab` — realtime collaboration сервер
+- `executor` — запуск кода
+- `postgres` — база данных
+- `redis` — realtime / pubsub
+- `nginx` — единая точка входа на `http://localhost`
 
-The project runs without a `.env` file because `docker-compose.yml` includes sane defaults.
-If you want to override secrets or provider settings, copy `.env.example` to `.env` and edit values.
+---
 
-## Architecture
+## Требования
 
-- `frontend`: Vite + React SPA
-- `backend`: FastAPI API, auth, project CRUD, run/review orchestration, leaderboard, activity websocket
-- `collab`: Hocuspocus WebSocket server for CRDT sync, awareness and cursor presence
-- `executor`: isolated code execution service using ephemeral Docker containers
-- `postgres`: durable relational persistence
-- `redis`: pub/sub fan-out and cross-instance realtime coordination
-- `nginx`: single public entrypoint
+Перед запуском должны быть установлены:
 
-## Security and execution
+- [Git](https://git-scm.com/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-- short-lived access JWT
-- rotating refresh token in HttpOnly cookie
-- protected project and websocket access
-- executor runs code in isolated containers with no network, timeout, memory/CPU limits, pids limit, read-only rootfs and cleanup
-- backend never executes user code directly
+Для Windows:
+- Docker Desktop должен быть **запущен**
+- желательно включить WSL2 backend
 
-## Supported languages
+---
 
-- Python
-- JavaScript
+## Клонирование проекта с GitHub
 
-## High-level product flow
-
-1. Register or log in.
-2. Create a project in the dashboard.
-3. Open the project room and collaborate in real time.
-4. Run the current snapshot safely.
-5. Request AI review and inspect structured findings.
-6. Use activity log and leaderboard to track collaboration.
-
-## Notes
-
-- AI review works with an OpenAI-compatible API, but the system still works without any AI key by switching to deterministic fallback review.
-- For local HTTP, keep `SECURE_COOKIES=false`. For HTTPS deployments, set it to `true`.
+```bash
+git clone https://github.com/HawHack/IDE-AI.git
+cd IDE-AI/collaborative-ide
