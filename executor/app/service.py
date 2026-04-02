@@ -19,7 +19,7 @@ logger = structlog.get_logger(__name__)
 @dataclass(frozen=True, slots=True)
 class LanguageRuntime:
     filename: str
-    command: list[str] | None
+    command: list[str]
 
 
 LANGUAGE_RUNTIMES: dict[str, LanguageRuntime] = {
@@ -29,21 +29,22 @@ LANGUAGE_RUNTIMES: dict[str, LanguageRuntime] = {
     ),
     "javascript": LanguageRuntime(
         filename="main.js",
-        command=None,
+        command=["node", "main.js"],
     ),
 }
 
 
 class SandboxExecutor:
     def execute(self, *, language: str, source_code: str) -> ExecuteResponse:
-        runtime = LANGUAGE_RUNTIMES[language]
-
-        if runtime.command is None:
+        runtime = LANGUAGE_RUNTIMES.get(language)
+        if runtime is None:
+            supported = ", ".join(sorted(LANGUAGE_RUNTIMES))
+            message = f"Unsupported language: {language}. Supported languages: {supported}."
             return ExecuteResponse(
                 status="failed",
                 stdout="",
-                stderr="This simplified executor currently supports only Python.",
-                combined_output="This simplified executor currently supports only Python.",
+                stderr=message,
+                combined_output=message,
                 exit_code=1,
                 duration_ms=0,
                 timed_out=False,
@@ -132,5 +133,5 @@ class SandboxExecutor:
         return {
             "timeoutSeconds": settings.executor_timeout_seconds,
             "maxOutputBytes": settings.executor_max_output_bytes,
-            "mode": "direct_subprocess_python_only",
+            "mode": "direct_subprocess_python_and_node",
         }

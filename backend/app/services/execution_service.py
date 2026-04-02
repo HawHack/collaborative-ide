@@ -69,13 +69,16 @@ class ExecutionService:
         await self._apply_executor_result(run=run, result=result)
         await self.session.commit()
 
+        event_type = self._event_type_for_status(run.status)
+        points = 5 if run.status == "completed" else 1
+
         await self.activity_service.record(
             project_id=project.id,
             actor_user_id=user.id,
-            event_type="execution.completed" if run.status == "completed" else "execution.timeout",
+            event_type=event_type,
             message=f"{user.full_name} ran {language} code",
             payload={"runId": run.id, "status": run.status, "exitCode": run.exit_code},
-            points=5 if run.status == "completed" else 1,
+            points=points,
         )
 
         await EventBus.publish(
@@ -100,3 +103,11 @@ class ExecutionService:
         run.finished_at = datetime.now(UTC)
         run.limits = result.limits
         await self.run_repository.save(run)
+
+    @staticmethod
+    def _event_type_for_status(status: str) -> str:
+        if status == "completed":
+            return "execution.completed"
+        if status == "timeout":
+            return "execution.timeout"
+        return "execution.failed"

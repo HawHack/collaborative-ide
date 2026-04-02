@@ -1,0 +1,872 @@
+{
+  "project_root": "C:\\Users\\Dan\\collaborative-ide",
+  "files": [
+    {
+      "path": ".env",
+      "size_bytes": 1293,
+      "sha256": "537e18bf7f05190ab69b6b48a83b8d12279e55d0cbc3a4fa69d675c0d2cf3c70",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": ".gitignore",
+      "size_bytes": 322,
+      "sha256": "8b3a9a53d802dbef5346186047ea8d1d7f550b9da8c78f54c5d115a81a87b628",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/alembic.ini",
+      "size_bytes": 663,
+      "sha256": "76833f443d225e9a929ba40a67a80ed1c8cd2f2bbb59bbd13a41b7cc48eaa409",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/alembic/env.py",
+      "size_bytes": 1436,
+      "sha256": "29f1485f5ba6120a9b1c767b5218ed8128864b88a3a1f61a1b3e2cc1788205fe",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/alembic/script.py.mako",
+      "size_bytes": 530,
+      "sha256": "9059f7719eb311b3efea3c78a8fad8de662aa876e790eb53c6658a1621362535",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/alembic/versions/20260331_0001_initial.py",
+      "size_bytes": 11344,
+      "sha256": "cefd9b33cdd83c4e3f0de509b0bedfc662bd9b5e11c88cfbca7c991a505965ab",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/ai/normalizer.py",
+      "size_bytes": 6390,
+      "sha256": "0e635eb0f7b2e6eb2e118ca00bf092b71510e76cc2f466bc91f7352e1645a264",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/ai/prompt_builder.py",
+      "size_bytes": 1265,
+      "sha256": "88e428893f3b5651d2fc7afaa593f1508c5edbb9381471f755bbbcf425436da3",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/ai/provider.py",
+      "size_bytes": 7326,
+      "sha256": "95c14699247f7d50ea04e79de6cf6bb01ce46d27b79bb10c13c1ccbc58fd9aee",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/api/router.py",
+      "size_bytes": 634,
+      "sha256": "ba52c7b511bb851b7d0ffb844a414befb505b331da33c7b57e4294f2dd6cd0da",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/api/v1/endpoints/activities.py",
+      "size_bytes": 1519,
+      "sha256": "39edcd98daddc640b6dd8dead2cd10be254373aef24b90db913b6fe6c4c6c6c0",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/api/v1/endpoints/ai_review.py",
+      "size_bytes": 1449,
+      "sha256": "2d5d39511dddadc372fc135f5e17f68087ec9778bcf4aa68a7bd1c8415baedd3",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/api/v1/endpoints/auth.py",
+      "size_bytes": 3703,
+      "sha256": "b35771d012646ab70c2b371654cc3ab3512aaf428d139c8af1ec7be605d03ec5",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/api/v1/endpoints/execution.py",
+      "size_bytes": 1385,
+      "sha256": "c1c74f317c84f28191aa44e5aaeff59966e403b3c7fea1a54635d9315b77c4c0",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/api/v1/endpoints/projects.py",
+      "size_bytes": 3507,
+      "sha256": "73935d458b2d31f8232f3b43bc88f25e51de30116e30fab490b0df17d0d5c33e",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/api/v1/endpoints/users.py",
+      "size_bytes": 405,
+      "sha256": "b33d514ca93c580ae99b6339bbdceb01b0ef7df7b7a4a696328bcc37ce70a02b",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/clients/executor_client.py",
+      "size_bytes": 854,
+      "sha256": "fb306f4b8aa492462017bc4203ad24b4490d3727f9a7ea6d291f96be7462ef89",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/core/config.py",
+      "size_bytes": 2217,
+      "sha256": "ba02c252393bb0875a1d6e1551ca5c044a729f8c9819785fab9edab8e8ec984b",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/core/dependencies.py",
+      "size_bytes": 1212,
+      "sha256": "338723ab520312c818f12490bb379f6d635a4022b4203ed8ecf165675936580a",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/core/exceptions.py",
+      "size_bytes": 2458,
+      "sha256": "32d6ae6af2c7635a519ccd2fa1432ef4e6fb3996b8b5460f0570ee8b8e36d373",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/core/logging.py",
+      "size_bytes": 944,
+      "sha256": "a50a5a75d7dcb503e5efc971cca4285fc8b935f06cd33c7d2d21895fd82b6e33",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/core/security.py",
+      "size_bytes": 2606,
+      "sha256": "b69b15c831a56b9a783210d67316ebd7f718bc0c0a2631539e7c1c75b85252ed",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/db/base.py",
+      "size_bytes": 54,
+      "sha256": "53cbbefe8014ad590e0183e9433d79e3f7a946094db43e9e654ab12bddaa40b3",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/db/session.py",
+      "size_bytes": 567,
+      "sha256": "2d0dcf61bcb7e1fe9b3894de22b7b6b36e68a0fd64c60d0d52a6b6bb8a9b8770",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/main.py",
+      "size_bytes": 1330,
+      "sha256": "7638c344401626b7a2e45a2a5529657b2fb4aa2c48645076ecbe1d756a4946c2",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/models/__init__.py",
+      "size_bytes": 573,
+      "sha256": "99999b4bffd4ec70db1bfdd3d8234a02a350d9c471e0d510d278ca3829529f0f",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/models/activity_event.py",
+      "size_bytes": 1098,
+      "sha256": "13f203ba380507d63bfa59089c7b600e6d1d32affb757347e12de20339f834d8",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/models/ai_review_record.py",
+      "size_bytes": 1513,
+      "sha256": "5dcf25096da57a721a2a77a6346ef8ae240c96a4c31338fea4c516e53ed2f8f2",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/models/base.py",
+      "size_bytes": 1270,
+      "sha256": "2bc0635fcbdb670c94075f896d1d4ad1dbabd8a8f8ece55463f6afa878973665",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/models/execution_run.py",
+      "size_bytes": 1730,
+      "sha256": "f376894d017b848db81a894fac20152a984fd508d1abbbe1fa35acf4a2c0a211",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/models/project.py",
+      "size_bytes": 1358,
+      "sha256": "3b5a83d3d3e2ae190f6cb73049eba6fd65d61bb15d2a396279cd2e5e3a1f66e3",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/models/project_document.py",
+      "size_bytes": 901,
+      "sha256": "99f14243c89629a8caa9ba3f1dd80a57836c8ac073b024a6ed16482ccc2c7c61",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/models/project_member.py",
+      "size_bytes": 1020,
+      "sha256": "25b7c4dd1391edbaafe6c7aa7f9f373d3d26261f2887f713c9789d94c95ef16c",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/models/refresh_token.py",
+      "size_bytes": 1187,
+      "sha256": "957e68ff3bdf9001f609da3738ec29268ab547779134b4beab651155675f722b",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/models/user.py",
+      "size_bytes": 911,
+      "sha256": "f4a6cfa938f8cc0ae832a4916aa426f00f738bb97a2c100969393f364bbfc24d",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/repositories/activity_repository.py",
+      "size_bytes": 2111,
+      "sha256": "1687663380f9ac138dea5531c1cdc975e1e3a358f6522d6d36a9328468f149ae",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/repositories/document_repository.py",
+      "size_bytes": 2001,
+      "sha256": "187faf25530ad19dd5832074fe06bfcf644f2e397150826e93c2ba556a34d878",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/repositories/project_repository.py",
+      "size_bytes": 3269,
+      "sha256": "d04a6dd0bde218590ce73733b2684086c89b28e97ebb54235f5dae107b480c9a",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/repositories/refresh_token_repository.py",
+      "size_bytes": 2101,
+      "sha256": "32e8cc96aa510932d0f1010b3b3610e1adc942de25d42c0e40cde375bf12597c",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/repositories/review_repository.py",
+      "size_bytes": 1621,
+      "sha256": "913822a6b648bb1c75af9fd8fd63efa5bd06fc18caa5e27be68cdc23ca6d228f",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/repositories/run_repository.py",
+      "size_bytes": 1590,
+      "sha256": "c7de7b0fb9e2a9ff7e43d573841428b1a91b6811f6ee8caa8f64cf675c559183",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/repositories/user_repository.py",
+      "size_bytes": 1009,
+      "sha256": "010a63f15e9421ea34cbb2800517ba5dc251e20ec1dd8df5a9b3b59dfa06c9d2",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/schemas/activity.py",
+      "size_bytes": 741,
+      "sha256": "ccab3d55a2e40c2ad8274d6ac238a869b55f86350414d2daaa777dd59df9cec5",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/schemas/ai_review.py",
+      "size_bytes": 1221,
+      "sha256": "86819c8fd7332ed44ab787c655bceb25f50fe5a980765541bb59c812088a1c13",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/schemas/auth.py",
+      "size_bytes": 886,
+      "sha256": "482e863d552623754b0931defb06633d69ed0a10e412d7533146d1a2a241e965",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/schemas/common.py",
+      "size_bytes": 513,
+      "sha256": "823768d9b86f6859f2192e033f79b50ab35fd6543a0c77d341a22af8e0f8a0aa",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/schemas/execution.py",
+      "size_bytes": 1154,
+      "sha256": "fc7f7e4dd09f5af0e3f224319b06c560276b3e01291874b74e32443ff517eab7",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/schemas/project.py",
+      "size_bytes": 1900,
+      "sha256": "49d4b77937c39496ff2b85dc22dd2ea9a4e64a88b671ca2770b5c3c3eb03e28a",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/schemas/user.py",
+      "size_bytes": 355,
+      "sha256": "82a27b1b1d2e3f7d08161a0f8aa514a0f5925d75dd2cfe34f310cbddd0f02583",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/services/activity_service.py",
+      "size_bytes": 2605,
+      "sha256": "235ca191cd1ee5bcbeeb6350fef2f2ec5050803d6c9044c2327e63fd36f77a83",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/services/ai_review_service.py",
+      "size_bytes": 5927,
+      "sha256": "af9f6a8bef56def28967a99de9e928f5d950713c5e4734ac71e7e1b314e35638",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/services/auth_service.py",
+      "size_bytes": 4124,
+      "sha256": "c13d6562ba5c554a4477111e41fd894a31b35b677675a5ee17921467e276feb0",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/services/execution_service.py",
+      "size_bytes": 4627,
+      "sha256": "fa60efed7c6a005b9a3f7f6fd6c73bbc90cbb447952b4f48c037da074741b782",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/services/leaderboard_service.py",
+      "size_bytes": 824,
+      "sha256": "a1a5a1781d818449eeaad679b2735ed568e9d7c28adb0fa9f7030ee87cccc2a9",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/services/project_service.py",
+      "size_bytes": 10185,
+      "sha256": "294861cc7741080277dac69d5cbd4bbc1498064f0c3933ee8ffc9bf9a8d2a96b",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/utils/code_templates.py",
+      "size_bytes": 404,
+      "sha256": "51a42d2b2c039d96c6fdfa10047c3427df76a9fbd262f96bd49718defd22b321",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/utils/pagination.py",
+      "size_bytes": 266,
+      "sha256": "66d118e25f3ec2b123c6a9d42840e61257290410507f4a0ead4d8181bdcfe0a4",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/websocket/event_bus.py",
+      "size_bytes": 1180,
+      "sha256": "55b49126359402cb842b987abb07777effed9bd78d6acd10c2ea5590c09b1573",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/app/websocket/routes.py",
+      "size_bytes": 4904,
+      "sha256": "9fbf531bcc290e8ed6f56860e98eaf15da0fbc0f4fce090384b9cfc03e9acaa3",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/Dockerfile",
+      "size_bytes": 374,
+      "sha256": "0361129230ce8917d69ff90eb5bd4ad2acfa6b22d0aa82a4386e0c8f0a2268ad",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/requirements.txt",
+      "size_bytes": 346,
+      "sha256": "055202170f9b8d10506b8ef3c69423c8771a99882a3b38294c92743f1790acbc",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "collab/Dockerfile",
+      "size_bytes": 287,
+      "sha256": "bcd92baf065adaa4fa2ca14285c38a13750291b7bdef2f55db2eb480006d9047",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "collab/package-lock.json",
+      "size_bytes": 16161,
+      "sha256": "68a3fc0a042ed22883ec3da9f17626297329ea575165db015efff98018fd384f",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "collab/package.json",
+      "size_bytes": 689,
+      "sha256": "52b1d808ac910eb9438670b06210c5dae384153e9c677e3c3e39ccce99593321",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "collab/src/auth.ts",
+      "size_bytes": 863,
+      "sha256": "7c9f85113fb88bee7fc60e64ffad5ccfbbf47f9180f1fdbf669e6742926b72f5",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "collab/src/config.ts",
+      "size_bytes": 822,
+      "sha256": "3bbc736e65ce9c71fbf6fc74762d82900696b98a8e7b2ae040b0c8cb984f85ec",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "collab/src/db.ts",
+      "size_bytes": 2498,
+      "sha256": "198e6df6c8cc4461a3ccf6b82fe53e5c17c98eb6da391c2bf85d7dfae7d4a596",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "collab/src/index.ts",
+      "size_bytes": 3091,
+      "sha256": "56ac8842d4c95d4c3fbccd835484fc4606c51fd6d8cfed4c2d05e506ea30c04d",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "collab/src/logger.ts",
+      "size_bytes": 726,
+      "sha256": "89bf067ba1a165ff4c9ab5f55bfb6a08dc6c33b18baa19d32f74050b1dc95c09",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "collab/tsconfig.json",
+      "size_bytes": 332,
+      "sha256": "e36e8a0103aa11ebead8db859d94252e36c043728401b60430ed92e1cbf3bc90",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "docker-compose.yml",
+      "size_bytes": 4474,
+      "sha256": "b752013f1e6025c94783772676ba0d5abd39841754b6f3dd46df05ff2d07caee",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "dump_project.py",
+      "size_bytes": 8737,
+      "sha256": "92998a34c88a679fb03b062e7de1984faf8d82f56e8edac4de4ee2cb6aa92ca0",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "executor/app/config.py",
+      "size_bytes": 1172,
+      "sha256": "9b92ffc2262d9f8b1edaa1568284aef907c2eb48091c002c15264e14b30fb090",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "executor/app/main.py",
+      "size_bytes": 1163,
+      "sha256": "f5fbf99f86ebc6485e95b85029a13291580b8b09e4ed38aac739957174523b83",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "executor/app/schemas.py",
+      "size_bytes": 555,
+      "sha256": "465ce3768538151c09aab089342b459e9687d668f49136b722ce38a6b5241b8f",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "executor/app/service.py",
+      "size_bytes": 4620,
+      "sha256": "377ffdc4a1750364ce7a0ee29b032ed9d24abe731632bfa37610152c72493ed4",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "executor/Dockerfile",
+      "size_bytes": 800,
+      "sha256": "cfca7e9a5511b207402f77885fc4ef8272b3957ef94f017bb266868803e6afae",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "executor/requirements.txt",
+      "size_bytes": 123,
+      "sha256": "741d3ceae8ce4244220a17c4ebcde6f70689ab5c89c2f75d17144abe978aa395",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/Dockerfile",
+      "size_bytes": 244,
+      "sha256": "3b8b2c2cb6b9dc250d0e3683d362dff43719047c8239dd79891375b599cecf78",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/index.html",
+      "size_bytes": 335,
+      "sha256": "f36f958fd01d33059d898d1c9d6b5c8168615858a582e4ecad3e857819a66b4c",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/package-lock.json",
+      "size_bytes": 115034,
+      "sha256": "2490a3ce2e245e0fdb8d67f64ac17ce5bd1480d6ee585b919deba188df0db858",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/package.json",
+      "size_bytes": 955,
+      "sha256": "806d4b1777bbb7b228f3c356ce6c5461bae0396fbeaa096297e790d4b23eca68",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/postcss.config.js",
+      "size_bytes": 85,
+      "sha256": "27e508f0506046526ffeaf51edc2fa24af25f45bad14d22c73afa4fa0e5eab77",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/App.tsx",
+      "size_bytes": 1142,
+      "sha256": "5103b1e5547d2e3cb755c0d67c56d44f643b29a68fb91342464835090cb1b0a8",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/components/ActivityLogPanel.tsx",
+      "size_bytes": 1764,
+      "sha256": "5824c396d15a6de402ecd4b37d4b2af47a0dbb8bc246bbafb2ebeb0e45051f33",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/components/AIReviewPanel.tsx",
+      "size_bytes": 8241,
+      "sha256": "cc57cc8a114e04da25bfd1e9d918baf9809a36409ffc948ab4bf309e2f880115",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/components/CreateProjectModal.tsx",
+      "size_bytes": 5246,
+      "sha256": "d141ecf08ec012142661f5593a646ae21c7fb90562ea4ce6e0cffcd7346b3508",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/components/LeaderboardPanel.tsx",
+      "size_bytes": 2325,
+      "sha256": "f268772f2e54b86a787e071859a6165a65bf65b12470007ebf84c2097d3711b7",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/components/MemberPresence.tsx",
+      "size_bytes": 3196,
+      "sha256": "03ecb308ebf83c5c9fa3dee18c071d749f08a77088ef253f28f3d376c0da7090",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/components/ProjectCard.tsx",
+      "size_bytes": 2421,
+      "sha256": "3403b2d0b9f6915724d8a4c01b3b225b8b74ee2cd6a5c30030bd8881475b77a5",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/components/ProjectSidebar.tsx",
+      "size_bytes": 9446,
+      "sha256": "fb11691c7e4b3e3fac4af2d12c1d05c1c0dd1dd89b9e20572f99ae40a0572277",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/components/ProtectedRoute.tsx",
+      "size_bytes": 775,
+      "sha256": "4d31afa0fadfe49977d3a2c0aaeaa99c20981619de1d8bd642308b0b41400385",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/components/RunPanel.tsx",
+      "size_bytes": 4228,
+      "sha256": "cff802ef83d912e55502497e250ec66294bdf779491e3055ecc02b356509ee2e",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/components/Topbar.tsx",
+      "size_bytes": 2682,
+      "sha256": "e804847efb9372d5164ad194ac9a7df9d100654d3d5505a9f2dbe952b7951e38",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/context/AuthContext.tsx",
+      "size_bytes": 3124,
+      "sha256": "55a80d3aa50b5cc36dff9414aa868a51d70ca98789d10a61f7fa737a48dd2ce5",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/hooks/useAuth.ts",
+      "size_bytes": 279,
+      "sha256": "30d68ef1ae48a47dfbfff26914ea084302ac979e7c53e5be56ca402218e8f095",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/hooks/useDebounce.ts",
+      "size_bytes": 351,
+      "sha256": "4c75bbe316de0c00fe702ce2fd6afbc82764d40c0b97723ccea49ec0ac15b738",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/layouts/AppLayout.tsx",
+      "size_bytes": 360,
+      "sha256": "4434f202615243bb5b7809f666b21bf4b314ce48c598abacd31cd2e8a77d109a",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/layouts/AuthLayout.tsx",
+      "size_bytes": 2016,
+      "sha256": "e8704794c2cbe0bb6ce2cfb9cad56a8e19d21c5771a8a68855cd879df223de31",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/lib/api.ts",
+      "size_bytes": 2315,
+      "sha256": "7df35ad3243fcde2a4f1c81111d646003cc057e579f7f166fc051fa599ecd5ed",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/lib/collab.ts",
+      "size_bytes": 2874,
+      "sha256": "4cf4cc0bb3a4a9ca1c80c945d8cfcf8502b9408484042ec1e24bea1740b39ac6",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/lib/utils.ts",
+      "size_bytes": 639,
+      "sha256": "8c8375bb7ae37bdeda8f7990d622e91d286b0fba73c3119e88609e277ed860ef",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/main.tsx",
+      "size_bytes": 453,
+      "sha256": "b6ea598b1568b9fc085f8e1efb39c1d02f18e64cbab8470e2b9d1f42992c0892",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/pages/DashboardPage.tsx",
+      "size_bytes": 6700,
+      "sha256": "ee58cdde93baea0f311f79e2bf10e1a12d3aa5189f185a0a830a077539712d12",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/pages/LoginPage.tsx",
+      "size_bytes": 3763,
+      "sha256": "76f957cc8e96d8a7e97e9e886f1a1ccbdc2942142fa7571a6fdb502ac9ca6838",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/pages/NotFoundPage.tsx",
+      "size_bytes": 847,
+      "sha256": "05e41b38e95cc71cf4510e47d3a1f233901c9cb052e77264fdd6126a14554bcb",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/pages/ProjectPage.tsx",
+      "size_bytes": 24137,
+      "sha256": "aeea33b48a32357b60383c933971abde5f24f55e4feb2c82af618584d85f27ee",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/pages/RegisterPage.tsx",
+      "size_bytes": 4145,
+      "sha256": "f69349853cd082303d9d77ffabb72c9e64576b9f6792e287b017520ea6c31314",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/services/activityService.ts",
+      "size_bytes": 604,
+      "sha256": "698b8c014871d87c8ed2f98b6a9344aaef815d2ccd3b0bd83aee18b75d5af59a",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/services/authService.ts",
+      "size_bytes": 1535,
+      "sha256": "70fd2d66ee1fa9131334f8871b064a95d1650cc3593c2445bd2bcdcb290b4cdb",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/services/executionService.ts",
+      "size_bytes": 1059,
+      "sha256": "d17a6b2722775f16bbd177d267118f078c5710c395a855389a30525d5a01122f",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/services/projectService.ts",
+      "size_bytes": 1080,
+      "sha256": "5ffaf0adfd83bfab853b8ea12c5fce0147d5e79dccbc4646e90beedccf673e40",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/services/reviewService.ts",
+      "size_bytes": 645,
+      "sha256": "faf6917598feef283161dded52b8fcf1bae1aa7ae576b2cd01b36b122db9fa7f",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/styles/index.css",
+      "size_bytes": 857,
+      "sha256": "a447054bc2b8991ae207918be836b32cfabee60ac58a31510918c75eeb0f8eba",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/src/types/api.ts",
+      "size_bytes": 3340,
+      "sha256": "d6158ed5b683ee2285e88981c5a6dafcf0900c0ba988517233229fca0945a634",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/tailwind.config.js",
+      "size_bytes": 351,
+      "sha256": "f5f8cc7a7541c0dd255ad57dbeedae743bfa7dcb97ce60367fa4a502f0971826",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/tsconfig.json",
+      "size_bytes": 645,
+      "sha256": "06f30a49b0d5434329c6e9ad96558133a47b8bd156c26b87f84369216013ec96",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/tsconfig.node.json",
+      "size_bytes": 294,
+      "sha256": "ec472f44bb47cc449afcf88c3cd44891da21f23cd0b704e586dbae9586cf5ca1",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/vite.config.ts",
+      "size_bytes": 350,
+      "sha256": "9fe90200f28f5f5aa442c9ff2bd03cfdecd6baa3bca7e08cc799035a964b937d",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "nginx/nginx.conf",
+      "size_bytes": 1036,
+      "sha256": "d5656e04bfe92cf6fdfc4a8c70dce70b24a1491c613ef14309c92cf477b30662",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "package-lock.json",
+      "size_bytes": 923,
+      "sha256": "fbbba1af6ba320b4ca4ee37d0a42d69df770b3b432200c80fa60e1003f057f0e",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "package.json",
+      "size_bytes": 57,
+      "sha256": "6cf25bd9069b575f94701d1e8c324a847c05c4df8754aae4fd6cc2f8cf225f33",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "README.md",
+      "size_bytes": 10842,
+      "sha256": "973cd300a417be5987582e41959600336364c05d19cbf272da0659ef26fc71af",
+      "type": "text",
+      "encoding": "utf-8"
+    }
+  ],
+  "stats": {
+    "total_files": 123,
+    "text_files": 123,
+    "binary_files": 0,
+    "unreadable_files": 0
+  }
+}

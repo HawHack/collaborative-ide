@@ -1,0 +1,56 @@
+[
+  {
+    "file": "/mnt/data/collaborative_ide_compiler_fix/backend/app/schemas/project.py",
+    "tool": "py_compile",
+    "ok": true,
+    "stderr": ""
+  },
+  {
+    "file": "/mnt/data/collaborative_ide_compiler_fix/backend/app/repositories/project_repository.py",
+    "tool": "py_compile",
+    "ok": true,
+    "stderr": ""
+  },
+  {
+    "file": "/mnt/data/collaborative_ide_compiler_fix/backend/app/services/project_service.py",
+    "tool": "py_compile",
+    "ok": true,
+    "stderr": ""
+  },
+  {
+    "file": "/mnt/data/collaborative_ide_compiler_fix/backend/app/api/v1/endpoints/projects.py",
+    "tool": "py_compile",
+    "ok": true,
+    "stderr": ""
+  },
+  {
+    "file": "/mnt/data/collaborative_ide_compiler_fix/frontend/src/types/api.ts",
+    "tool": "typescript-transpileModule",
+    "ok": true,
+    "stderr": ""
+  },
+  {
+    "file": "/mnt/data/collaborative_ide_compiler_fix/frontend/src/services/projectService.ts",
+    "tool": "typescript-transpileModule",
+    "ok": true,
+    "stderr": ""
+  },
+  {
+    "file": "/mnt/data/collaborative_ide_compiler_fix/frontend/src/components/ProjectSidebar.tsx",
+    "tool": "typescript-transpileModule",
+    "ok": true,
+    "stderr": ""
+  },
+  {
+    "file": "/mnt/data/collaborative_ide_compiler_fix/frontend/src/components/RunPanel.tsx",
+    "tool": "typescript-transpileModule",
+    "ok": true,
+    "stderr": ""
+  },
+  {
+    "file": "/mnt/data/collaborative_ide_compiler_fix/frontend/src/pages/ProjectPage.tsx",
+    "tool": "typescript-transpileModule",
+    "ok": true,
+    "stderr": ""
+  }
+]

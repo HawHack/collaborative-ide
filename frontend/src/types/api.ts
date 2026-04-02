@@ -3,8 +3,8 @@ export type User = {
   email: string;
   full_name: string;
   avatar_color: string;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 };
 
 export type AuthSessionResponse = {
@@ -20,15 +20,15 @@ export type RefreshResponse = {
   expires_at: string;
 };
 
+export type ProjectRole = "owner" | "editor" | "viewer";
+export type ProjectVisibility = "private" | "public";
+export type RuntimeLanguage = "python" | "javascript";
+export type ExecutionStatus = "queued" | "running" | "completed" | "failed" | "timeout";
+
 export type ProjectMember = {
-  role: "owner" | "editor" | "viewer";
+  role: ProjectRole;
   joined_at: string;
-  user: {
-    id: string;
-    email: string;
-    full_name: string;
-    avatar_color: string;
-  };
+  user: User;
 };
 
 export type ProjectListItem = {
@@ -36,25 +36,15 @@ export type ProjectListItem = {
   owner_id: string;
   name: string;
   description: string;
-  language: "python" | "javascript";
-  visibility: "private" | "team";
+  language: RuntimeLanguage;
+  visibility: ProjectVisibility;
   member_count: number;
   last_activity_at: string | null;
   created_at: string;
   updated_at: string;
 };
 
-export type Project = {
-  id: string;
-  owner_id: string;
-  name: string;
-  description: string;
-  language: "python" | "javascript";
-  visibility: "private" | "team";
-  member_count: number;
-  last_activity_at: string | null;
-  created_at: string;
-  updated_at: string;
+export type Project = ProjectListItem & {
   members: ProjectMember[];
   collab_ws_url: string;
 };
@@ -66,18 +56,18 @@ export type ProjectDocument = {
   ydoc_state_base64: string | null;
 };
 
+export type ProjectRoomInfo = {
+  project: Project;
+  document: ProjectDocument;
+  current_user_role: ProjectRole;
+  collab_ws_url: string;
+};
+
 export type ProjectDocumentUpdateResponse = {
   project_id: string;
   plain_text: string;
   last_synced_at: string | null;
   updated_by_user_id: string | null;
-};
-
-export type ProjectRoomInfo = {
-  project: Project;
-  document: ProjectDocument;
-  current_user_role: "owner" | "editor" | "viewer";
-  collab_ws_url: string;
 };
 
 export type ActivityEvent = {
@@ -104,8 +94,8 @@ export type ExecutionRun = {
   id: string;
   project_id: string;
   actor_user_id: string | null;
-  language: "python" | "javascript";
-  status: "queued" | "completed" | "failed" | "timeout";
+  language: RuntimeLanguage;
+  status: ExecutionStatus;
   source_code: string;
   stdout: string;
   stderr: string;
@@ -150,4 +140,8 @@ export type AIReview = {
   merge_suggestion: AIReviewMergeSuggestion;
   raw_response: string;
   fallback_used: boolean;
+};
+
+export type ApiMessageResponse = {
+  message: string;
 };

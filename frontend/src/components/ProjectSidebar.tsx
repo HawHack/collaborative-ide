@@ -27,6 +27,8 @@ export default function ProjectSidebar({
 }: ProjectSidebarProps) {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<"editor" | "viewer">("editor");
+  const [memberActionError, setMemberActionError] = useState<string | null>(null);
+  const [memberActionState, setMemberActionState] = useState<string | null>(null);
   const canManageMembers = currentUserRole === "owner";
 
   const sortedMembers = useMemo(
@@ -39,8 +41,50 @@ export default function ProjectSidebar({
     if (!email || !onAddMember) {
       return;
     }
-    await onAddMember({ email, role: inviteRole });
-    setInviteEmail("");
+
+    setMemberActionError(null);
+    setMemberActionState("Adding collaborator...");
+    try {
+      await onAddMember({ email, role: inviteRole });
+      setInviteEmail("");
+      setMemberActionState("Collaborator added.");
+      setTimeout(() => setMemberActionState(null), 2000);
+    } catch (error) {
+      setMemberActionState(null);
+      setMemberActionError(extractMessage(error, "Unable to add collaborator."));
+    }
+  };
+
+  const handleRoleChange = async (userId: string, role: "editor" | "viewer") => {
+    if (!onUpdateMemberRole) {
+      return;
+    }
+    setMemberActionError(null);
+    setMemberActionState("Updating role...");
+    try {
+      await onUpdateMemberRole(userId, role);
+      setMemberActionState("Role updated.");
+      setTimeout(() => setMemberActionState(null), 2000);
+    } catch (error) {
+      setMemberActionState(null);
+      setMemberActionError(extractMessage(error, "Unable to update role."));
+    }
+  };
+
+  const handleRemoveMember = async (userId: string) => {
+    if (!onRemoveMember) {
+      return;
+    }
+    setMemberActionError(null);
+    setMemberActionState("Removing collaborator...");
+    try {
+      await onRemoveMember(userId);
+      setMemberActionState("Collaborator removed.");
+      setTimeout(() => setMemberActionState(null), 2000);
+    } catch (error) {
+      setMemberActionState(null);
+      setMemberActionError(extractMessage(error, "Unable to remove collaborator."));
+    }
   };
 
   return (
@@ -88,6 +132,10 @@ export default function ProjectSidebar({
             </button>
           ))}
         </div>
+
+        {isSaving ? (
+          <div className="mt-3 text-xs text-slate-500">Saving editor changes…</div>
+        ) : null}
       </div>
 
       <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -104,35 +152,52 @@ export default function ProjectSidebar({
             </div>
 
             <input
+              type="email"
               value={inviteEmail}
               onChange={(event) => setInviteEmail(event.target.value)}
-              placeholder="user@example.com"
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/80 px-3 py-2.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-indigo-400/40"
+              placeholder="teammate@example.com"
+              className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-3 py-2.5 text-sm text-white outline-none transition focus:border-indigo-400/60"
             />
 
-            <div className="grid grid-cols-[1fr_auto] gap-2">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
               <select
                 value={inviteRole}
                 onChange={(event) => setInviteRole(event.target.value as "editor" | "viewer")}
-                className="rounded-2xl border border-white/10 bg-slate-950/80 px-3 py-2.5 text-sm text-slate-200 outline-none"
+                className="rounded-2xl border border-white/10 bg-slate-950/70 px-3 py-2.5 text-sm text-white outline-none transition focus:border-indigo-400/60"
               >
-                <option value="editor">editor</option>
-                <option value="viewer">viewer</option>
+                <option value="editor">Editor</option>
+                <option value="viewer">Viewer</option>
               </select>
 
               <button
                 type="button"
                 onClick={() => void handleInvite()}
-                disabled={isSaving || !inviteEmail.trim()}
+                disabled={!inviteEmail.trim()}
                 className="rounded-2xl bg-indigo-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Add
               </button>
             </div>
-          </div>
-        ) : null}
 
-        <div className="mt-3 space-y-3">
+            {memberActionState ? (
+              <div className="rounded-2xl border border-sky-400/20 bg-sky-500/10 px-3 py-2 text-xs text-sky-200">
+                {memberActionState}
+              </div>
+            ) : null}
+
+            {memberActionError ? (
+              <div className="rounded-2xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+                {memberActionError}
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          <div className="mt-3 rounded-2xl border border-dashed border-white/10 bg-slate-950/40 px-4 py-3 text-sm text-slate-400">
+            Only the owner can invite or remove collaborators.
+          </div>
+        )}
+
+        <div className="mt-4 space-y-3">
           {sortedMembers.map((member) => {
             const isOwner = member.role === "owner";
             return (
@@ -142,7 +207,7 @@ export default function ProjectSidebar({
               >
                 <div className="flex items-start gap-3">
                   <div
-                    className="flex h-10 w-10 items-center justify-center rounded-xl text-sm font-semibold text-white"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-sm font-semibold text-white"
                     style={{ backgroundColor: member.user.avatar_color }}
                   >
                     {initials(member.user.full_name)}
@@ -155,51 +220,45 @@ export default function ProjectSidebar({
                       </div>
                       {isOwner ? (
                         <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/20 bg-amber-500/10 px-2 py-0.5 text-[11px] text-amber-200">
-                          <Crown size={11} /> owner
+                          <Crown size={12} />
+                          owner
                         </span>
-                      ) : null}
+                      ) : (
+                        <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] text-slate-400">
+                          {member.role}
+                        </span>
+                      )}
                     </div>
-                    <div className="truncate text-xs text-slate-400">{member.user.email}</div>
+
+                    <div className="mt-1 truncate text-xs text-slate-500">{member.user.email}</div>
+
+                    {canManageMembers && !isOwner ? (
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <select
+                          value={member.role}
+                          onChange={(event) =>
+                            void handleRoleChange(
+                              member.user.id,
+                              event.target.value as "editor" | "viewer"
+                            )
+                          }
+                          className="rounded-xl border border-white/10 bg-slate-900 px-2.5 py-2 text-xs text-white outline-none"
+                        >
+                          <option value="editor">Editor</option>
+                          <option value="viewer">Viewer</option>
+                        </select>
+
+                        <button
+                          type="button"
+                          onClick={() => void handleRemoveMember(member.user.id)}
+                          className="inline-flex items-center gap-1 rounded-xl border border-rose-400/20 bg-rose-500/10 px-2.5 py-2 text-xs text-rose-200 transition hover:bg-rose-500/20"
+                        >
+                          <Trash2 size={13} />
+                          Remove
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
-                </div>
-
-                <div className="mt-3 flex items-center justify-between gap-2">
-                  {isOwner ? (
-                    <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-300">
-                      owner
-                    </span>
-                  ) : canManageMembers ? (
-                    <select
-                      value={member.role}
-                      onChange={(event) =>
-                        void onUpdateMemberRole?.(
-                          member.user.id,
-                          event.target.value as "editor" | "viewer"
-                        )
-                      }
-                      disabled={isSaving}
-                      className="rounded-2xl border border-white/10 bg-slate-950/80 px-3 py-2 text-sm text-slate-200 outline-none"
-                    >
-                      <option value="editor">editor</option>
-                      <option value="viewer">viewer</option>
-                    </select>
-                  ) : (
-                    <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-300">
-                      {member.role}
-                    </span>
-                  )}
-
-                  {canManageMembers && !isOwner ? (
-                    <button
-                      type="button"
-                      onClick={() => void onRemoveMember?.(member.user.id)}
-                      disabled={isSaving}
-                      className="inline-flex items-center gap-1 rounded-2xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-200 transition hover:bg-rose-500/15 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      <Trash2 size={13} />
-                      Remove
-                    </button>
-                  ) : null}
                 </div>
               </div>
             );
@@ -212,11 +271,16 @@ export default function ProjectSidebar({
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-slate-400">{label}</span>
-      <span className="rounded-full border border-white/10 bg-slate-950/70 px-2.5 py-1 text-xs text-slate-200">
-        {value}
-      </span>
+    <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-slate-950/60 px-3 py-2.5">
+      <span className="text-slate-500">{label}</span>
+      <span className="font-medium capitalize text-slate-200">{value}</span>
     </div>
   );
+}
+
+function extractMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message.trim()) {
+    return error.message;
+  }
+  return fallback;
 }

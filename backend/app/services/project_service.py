@@ -5,14 +5,13 @@ import base64
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
-from app.core.exceptions import ForbiddenError, NotFoundError
+from app.core.exceptions import ConflictError, ForbiddenError, NotFoundError
 from app.models.project import Project
-from app.models.project_member import ProjectMember
 from app.models.user import User
 from app.repositories.document_repository import DocumentRepository
 from app.repositories.project_repository import ProjectRepository
+from app.repositories.user_repository import UserRepository
 from app.schemas.project import (
-    ProjectCreateRequest,
     ProjectDocumentRead,
     ProjectDocumentUpdateResponse,
     ProjectListItem,
@@ -31,6 +30,7 @@ class ProjectService:
         self.session = session
         self.project_repository = ProjectRepository(session)
         self.document_repository = DocumentRepository(session)
+        self.user_repository = UserRepository(session)
         self.activity_service = ActivityService(session)
 
     def _members_to_schema(self, project: Project) -> list[ProjectMemberRead]:
@@ -198,7 +198,7 @@ class ProjectService:
                 event_type="project.updated",
                 message=f"{user.full_name} updated project settings",
                 payload=changed,
-                points=3,
+                points=2,
                 commit=False,
             )
 
@@ -244,6 +244,84 @@ class ProjectService:
             last_synced_at=document.last_synced_at,
             updated_by_user_id=document.updated_by_user_id,
         )
+
+    async def add_member(self, *, project_id: str, user: User, email: str, role: str) -> ProjectRead:
+        project = await self.get_project_model(project_id=project_id, user=user)
+        if project.owner_id != user.id:
+            raise ForbiddenError("Only the project owner can add members.")
+
+        target_user = await self.user_repository.get_by_email(email)
+        if target_user is None:
+            raise NotFoundError("User with this email was not found.")
+
+        if target_user.id == project.owner_id:
+            raise ConflictError("Project owner is already part of the project.")
+
+        existing_member = await self.project_repository.get_member(project_id=project.id, user_id=target_user.id)
+        if existing_member is not None:
+            raise ConflictError("This user is already in the project.")
+
+        await self.project_repository.add_member(project_id=project.id, user_id=target_user.id, role=role)
+        await self.activity_service.record(
+            project_id=project.id,
+            actor_user_id=user.id,
+            event_type="project.member_added",
+            message=f"{user.full_name} added {target_user.full_name} to the project",
+            payload={"memberUserId": target_user.id, "role": role, "email": target_user.email},
+            points=2,
+            commit=False,
+        )
+        await self.session.commit()
+        return await self.get_project(project_id=project.id, user=user)
+
+    async def update_member_role(self, *, project_id: str, user: User, member_user_id: str, role: str) -> ProjectRead:
+        project = await self.get_project_model(project_id=project_id, user=user)
+        if project.owner_id != user.id:
+            raise ForbiddenError("Only the project owner can update member roles.")
+        if member_user_id == project.owner_id:
+            raise ForbiddenError("Owner role cannot be changed.")
+
+        member = await self.project_repository.update_member_role(
+            project_id=project.id,
+            user_id=member_user_id,
+            role=role,
+        )
+        if member is None:
+            raise NotFoundError("Project member not found.")
+
+        await self.activity_service.record(
+            project_id=project.id,
+            actor_user_id=user.id,
+            event_type="project.member_role_updated",
+            message=f"{user.full_name} changed a member role to {role}",
+            payload={"memberUserId": member_user_id, "role": role},
+            points=1,
+            commit=False,
+        )
+        await self.session.commit()
+        return await self.get_project(project_id=project.id, user=user)
+
+    async def remove_member(self, *, project_id: str, user: User, member_user_id: str) -> None:
+        project = await self.get_project_model(project_id=project_id, user=user)
+        if project.owner_id != user.id:
+            raise ForbiddenError("Only the project owner can remove members.")
+        if member_user_id == project.owner_id:
+            raise ForbiddenError("Project owner cannot be removed.")
+
+        removed = await self.project_repository.remove_member(project_id=project.id, user_id=member_user_id)
+        if not removed:
+            raise NotFoundError("Project member not found.")
+
+        await self.activity_service.record(
+            project_id=project.id,
+            actor_user_id=user.id,
+            event_type="project.member_removed",
+            message=f"{user.full_name} removed a collaborator from the project",
+            payload={"memberUserId": member_user_id},
+            points=0,
+            commit=False,
+        )
+        await self.session.commit()
 
     async def delete_project(self, *, project_id: str, user: User) -> None:
         project = await self.get_project_model(project_id=project_id, user=user)

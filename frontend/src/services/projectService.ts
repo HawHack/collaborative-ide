@@ -1,7 +1,9 @@
 import { api } from "@/lib/api";
 import type {
+  ApiMessageResponse,
   Project,
   ProjectDocumentUpdateResponse,
+  ProjectListItem,
   ProjectRoomInfo,
 } from "@/types/api";
 
@@ -11,15 +13,18 @@ type CreateProjectPayload = {
   language: "python" | "javascript";
 };
 
-type UpdateProjectPayload = {
-  name?: string;
-  description?: string;
-  language?: "python" | "javascript";
+type AddMemberPayload = {
+  email: string;
+  role: "editor" | "viewer";
+};
+
+type UpdateMemberRolePayload = {
+  role: "editor" | "viewer";
 };
 
 export const projectService = {
   async list(search?: string) {
-    const response = await api.get<Project[]>("/projects", {
+    const response = await api.get<ProjectListItem[]>("/projects", {
       params: search ? { search } : undefined,
     });
     return response.data;
@@ -30,29 +35,33 @@ export const projectService = {
     return response.data;
   },
 
-  async get(projectId: string) {
-    const response = await api.get<Project>(`/projects/${projectId}`);
-    return response.data;
-  },
-
   async getRoom(projectId: string) {
     const response = await api.get<ProjectRoomInfo>(`/projects/${projectId}/room`);
     return response.data;
   },
 
-  async saveDocument(projectId: string, plain_text: string) {
-    const response = await api.put<ProjectDocumentUpdateResponse>(`/projects/${projectId}/document`, {
-      plain_text,
-    });
+  async saveDocument(projectId: string, plainText: string) {
+    const response = await api.put<ProjectDocumentUpdateResponse>(
+      `/projects/${projectId}/document`,
+      {
+        plain_text: plainText,
+      }
+    );
     return response.data;
   },
 
-  async update(projectId: string, payload: UpdateProjectPayload) {
-    const response = await api.patch<Project>(`/projects/${projectId}`, payload);
+  async addMember(projectId: string, payload: AddMemberPayload) {
+    const response = await api.post<Project>(`/projects/${projectId}/members`, payload);
     return response.data;
   },
 
-  async remove(projectId: string) {
-    await api.delete(`/projects/${projectId}`);
+  async updateMemberRole(projectId: string, userId: string, payload: UpdateMemberRolePayload) {
+    const response = await api.patch<Project>(`/projects/${projectId}/members/${userId}`, payload);
+    return response.data;
+  },
+
+  async removeMember(projectId: string, userId: string) {
+    const response = await api.delete<ApiMessageResponse>(`/projects/${projectId}/members/${userId}`);
+    return response.data;
   },
 };

@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 
 class ProjectMemberUserRead(BaseModel):
@@ -25,7 +25,7 @@ class ProjectListItem(BaseModel):
     name: str
     description: str
     language: Literal["python", "javascript"]
-    visibility: Literal["private", "team"]
+    visibility: Literal["private", "public"]
     member_count: int
     last_activity_at: datetime | None
     created_at: datetime
@@ -72,3 +72,12 @@ class ProjectDocumentUpdateResponse(BaseModel):
     plain_text: str
     last_synced_at: datetime | None
     updated_by_user_id: str | None
+
+
+class ProjectMemberInviteRequest(BaseModel):
+    email: EmailStr
+    role: Literal["editor", "viewer"] = "editor"
+
+
+class ProjectMemberRoleUpdateRequest(BaseModel):
+    role: Literal["editor", "viewer"]

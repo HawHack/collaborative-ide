@@ -78,6 +78,32 @@ class ProjectRepository:
         await self.session.flush()
         return member
 
+    async def get_member(self, *, project_id: str, user_id: str) -> ProjectMember | None:
+        result = await self.session.execute(
+            select(ProjectMember).where(
+                ProjectMember.project_id == project_id,
+                ProjectMember.user_id == user_id,
+            )
+        )
+        return result.scalar_one_or_none()
+
+    async def update_member_role(self, *, project_id: str, user_id: str, role: str) -> ProjectMember | None:
+        member = await self.get_member(project_id=project_id, user_id=user_id)
+        if member is None:
+            return None
+        member.role = role
+        self.session.add(member)
+        await self.session.flush()
+        return member
+
+    async def remove_member(self, *, project_id: str, user_id: str) -> bool:
+        member = await self.get_member(project_id=project_id, user_id=user_id)
+        if member is None:
+            return False
+        await self.session.delete(member)
+        await self.session.flush()
+        return True
+
     async def delete(self, project: Project) -> None:
         await self.session.delete(project)
 

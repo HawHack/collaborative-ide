@@ -1,16 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import Editor, { OnMount } from "@monaco-editor/react";
-import type * as Monaco from "monaco-editor";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Editor, { type OnMount } from "@monaco-editor/react";
+import * as Monaco from "monaco-editor";
 import { MonacoBinding } from "y-monaco";
 import axios from "axios";
 import {
   ArrowLeft,
-  ChevronDown,
-  ChevronUp,
   Loader2,
-  Play,
   Save,
-  TerminalSquare,
+  Sparkles,
   Wifi,
   WifiOff,
 } from "lucide-react";
@@ -19,7 +16,6 @@ import { Link, useParams } from "react-router-dom";
 import ActivityLogPanel from "@/components/ActivityLogPanel";
 import AIReviewPanel from "@/components/AIReviewPanel";
 import LeaderboardPanel from "@/components/LeaderboardPanel";
-import MemberPresence from "@/components/MemberPresence";
 import ProjectSidebar from "@/components/ProjectSidebar";
 import RunPanel from "@/components/RunPanel";
 import { useAuth } from "@/hooks/useAuth";
@@ -55,6 +51,10 @@ function extractErrorMessage(error: unknown, fallback: string) {
     }
   }
 
+  if (error instanceof Error && error.message.trim()) {
+    return error.message;
+  }
+
   return fallback;
 }
 
@@ -64,9 +64,10 @@ function outputTitle(run: ExecutionRun | null) {
   if (!run) {
     return "No runs yet";
   }
-  return `${run.language} · ${run.status}${run.exit_code !== null ? ` · exit ${run.exit_code}` : ""}${
-    run.duration_ms !== null ? ` · ${run.duration_ms} ms` : ""
-  }`;
+
+  return `${run.language} · ${run.status}${
+    run.exit_code !== null ? ` · exit ${run.exit_code}` : ""
+  }${run.duration_ms !== null ? ` · ${run.duration_ms} ms` : ""}`;
 }
 
 function outputText(run: ExecutionRun | null) {
@@ -74,13 +75,12 @@ function outputText(run: ExecutionRun | null) {
     return "Run output will appear here.";
   }
 
-  const text =
+  return (
     run.combined_output?.trim() ||
     run.stdout?.trim() ||
     run.stderr?.trim() ||
-    "Process finished with no output.";
-
-  return text;
+    "Process finished with no output."
+  );
 }
 
 export default function ProjectPage() {
@@ -93,212 +93,216 @@ export default function ProjectPage() {
   const [runs, setRuns] = useState<ExecutionRun[]>([]);
   const [latestReview, setLatestReview] = useState<AIReview | null>(null);
   const [presenceUsers, setPresenceUsers] = useState<PresenceUser[]>([]);
+
   const [selectedLanguage, setSelectedLanguage] = useState<"python" | "javascript">("python");
+  const [sourceCode, setSourceCode] = useState("");
+  const sourceCodeRef = useRef("");
   const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [runError, setRunError] = useState<string | null>(null);
-  const [reviewError, setReviewError] = useState<string | null>(null);
-  const [saveError, setSaveError] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [isReviewing, setIsReviewing] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
-  const [collabStatus, setCollabStatus] = useState<"connecting" | "connected" | "disconnected">(
-    "connecting"
-  );
-  const [currentCode, setCurrentCode] = useState("");
-  const [outputCollapsed, setOutputCollapsed] = useState(false);
-  const [reviewCooldownUntil, setReviewCooldownUntil] = useState<number>(0);
+
+  const [pageError, setPageError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [runError, setRunError] = useState<string | null>(null);
+  const [reviewError, setReviewError] = useState<string | null>(null);
   const [reviewStatusText, setReviewStatusText] = useState<string | null>(null);
+  const [collabStatus, setCollabStatus] = useState<"connected" | "disconnected">("disconnected");
 
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
   const bindingRef = useRef<MonacoBinding | null>(null);
   const collabRef = useRef<ReturnType<typeof createCollabSession> | null>(null);
-  const suppressEditorChangeRef = useRef(false);
-  const reviewInFlightRef = useRef(false);
+  const saveTimeoutRef = useRef<number | null>(null);
 
-  const canEdit = room?.current_user_role !== "viewer";
   const latestRun = runs[0] ?? null;
 
-  const cooldownSeconds = useMemo(() => {
-    const diff = Math.ceil((reviewCooldownUntil - Date.now()) / 1000);
-    return diff > 0 ? diff : 0;
-  }, [reviewCooldownUntil, isReviewing, latestReview, reviewStatusText]);
+  const setLiveSourceCode = useCallback((nextCode: string) => {
+    sourceCodeRef.current = nextCode;
+    setSourceCode(nextCode);
+  }, []);
+
+  const getLiveSourceCode = useCallback(() => {
+    const collab = collabRef.current;
+    if (collab) {
+      return collab.text.toString();
+    }
+
+    const editorValue = editorRef.current?.getValue();
+    if (typeof editorValue === "string") {
+      return editorValue;
+    }
+
+    return sourceCodeRef.current;
+  }, []);
+
+  const refreshProjectMeta = useCallback(async () => {
+    if (!projectId) {
+      return;
+    }
+    const freshRoom = await projectService.getRoom(projectId);
+    setRoom(freshRoom);
+  }, [projectId]);
 
   useEffect(() => {
-    if (!reviewCooldownUntil) {
+    if (!projectId || !accessToken || !user) {
       return;
     }
 
-    const timer = window.setInterval(() => {
-      if (Date.now() >= reviewCooldownUntil) {
-        setReviewCooldownUntil(0);
-        setReviewStatusText((prev) =>
-          prev?.includes("cooldown") || prev?.includes("429") ? null : prev
-        );
-      }
-    }, 500);
+    let isMounted = true;
 
-    return () => window.clearInterval(timer);
-  }, [reviewCooldownUntil]);
-
-  const syncCodeFromEditor = () => {
-    const value = editorRef.current?.getValue() ?? "";
-    setCurrentCode(value);
-    return value;
-  };
-
-  const saveDocument = async (codeOverride?: string) => {
-    if (!projectId || !room || !canEdit) {
-      return;
-    }
-
-    const code = codeOverride ?? syncCodeFromEditor();
-
-    setSaveError(null);
-    setSaveStatus("saving");
-
-    try {
-      const saved = await projectService.saveDocument(projectId, code);
-
-      setRoom((prev) =>
-        prev
-          ? {
-              ...prev,
-              document: {
-                ...prev.document,
-                plain_text: saved.plain_text,
-                last_synced_at: saved.last_synced_at,
-              },
-            }
-          : prev
-      );
-
-      setCurrentCode(saved.plain_text);
-      setSaveStatus("saved");
-    } catch (error) {
-      setSaveStatus("unsaved");
-      setSaveError(extractErrorMessage(error, "Failed to save code."));
-      throw error;
-    }
-  };
-
-  useEffect(() => {
-    if (!projectId || !accessToken) {
-      return;
-    }
-
-    let active = true;
-
-    const loadRoom = async () => {
+    async function bootstrap() {
       setIsLoading(true);
-      setLoadError(null);
+      setPageError(null);
 
       try {
         const [roomData, activityData, leaderboardData, runData, reviewData] = await Promise.all([
           projectService.getRoom(projectId),
-          activityService.list(projectId, 50),
-          activityService.leaderboard(projectId, 20),
-          executionService.list(projectId, 20),
-          reviewService.list(projectId, 20),
+          activityService.list(projectId),
+          activityService.leaderboard(projectId),
+          executionService.list(projectId),
+          reviewService.list(projectId),
         ]);
 
-        if (!active) {
+        if (!isMounted) {
           return;
         }
 
         setRoom(roomData);
+        setSelectedLanguage(roomData.project.language);
+        setLiveSourceCode(roomData.document.plain_text ?? "");
         setActivities(activityData);
         setLeaderboard(leaderboardData);
         setRuns(runData);
         setLatestReview(reviewData[0] ?? null);
-        setSelectedLanguage(roomData.project.language);
-        setCurrentCode(roomData.document.plain_text ?? "");
-        setSaveStatus("saved");
       } catch (error) {
-        if (!active) {
+        if (!isMounted) {
           return;
         }
-        setLoadError(extractErrorMessage(error, "Failed to load project."));
+        setPageError(extractErrorMessage(error, "Unable to open the project."));
       } finally {
-        if (active) {
+        if (isMounted) {
           setIsLoading(false);
         }
       }
-    };
+    }
 
-    void loadRoom();
+    void bootstrap();
 
     return () => {
-      active = false;
+      isMounted = false;
     };
-  }, [projectId, accessToken]);
+  }, [projectId, accessToken, user, setLiveSourceCode]);
 
-  useEffect(() => {
-    if (!room || !projectId || !accessToken || !user) {
+  const flushSave = useCallback(async () => {
+    if (!projectId) {
       return;
     }
 
-    setCollabStatus("connecting");
+    const plainText = getLiveSourceCode();
+    setSaveStatus("saving");
+    setSaveError(null);
+
+    try {
+      const saved = await projectService.saveDocument(projectId, plainText);
+      setLiveSourceCode(saved.plain_text);
+      setSaveStatus("saved");
+    } catch (error) {
+      setSaveStatus("unsaved");
+      setSaveError(extractErrorMessage(error, "Unable to save project code."));
+      throw error;
+    }
+  }, [getLiveSourceCode, projectId, setLiveSourceCode]);
+
+  const scheduleAutosave = useCallback(() => {
+    if (!projectId) {
+      return;
+    }
+
+    if (saveTimeoutRef.current !== null) {
+      window.clearTimeout(saveTimeoutRef.current);
+    }
+
+    setSaveStatus("unsaved");
+
+    saveTimeoutRef.current = window.setTimeout(() => {
+      void flushSave();
+    }, 800);
+  }, [flushSave, projectId]);
+
+  useEffect(() => {
+    if (!room || !accessToken || !user) {
+      return;
+    }
 
     const collab = createCollabSession({
-      projectId,
+      projectId: room.project.id,
+      wsUrl: room.collab_ws_url,
       token: accessToken,
-      user: {
-        name: user.full_name,
-        color: user.avatar_color,
-      },
-      initialText: room.document.plain_text ?? "",
+      initialPlainText: room.document.plain_text ?? "",
       initialStateBase64: room.document.ydoc_state_base64,
+      user: {
+        id: user.id,
+        full_name: user.full_name,
+        email: user.email,
+        avatar_color: user.avatar_color,
+      },
     });
 
     collabRef.current = collab;
+    setCollabStatus("connected");
+    setLiveSourceCode(collab.text.toString());
 
-    const handleStatus = (status: "connecting" | "connected" | "disconnected") => {
-      setCollabStatus(status);
+    const syncPresence = () => {
+      setPresenceUsers(readPresenceUsers(collab.awareness));
     };
 
-    const handleAwarenessChange = () => {
-      setPresenceUsers(readPresenceUsers(collab.provider.awareness));
+    const syncText = () => {
+      setLiveSourceCode(collab.text.toString());
     };
 
-    const handleDocUpdate = () => {
-      if (suppressEditorChangeRef.current) {
-        return;
-      }
-      const value = collab.text.toString();
-      setCurrentCode(value);
-      setSaveStatus("unsaved");
-    };
+    const handleOpen = () => setCollabStatus("connected");
+    const handleDisconnect = () => setCollabStatus("disconnected");
+    const handleClose = () => setCollabStatus("disconnected");
 
-    collab.provider.on("status", ({ status }: { status: "connecting" | "connected" | "disconnected" }) =>
-      handleStatus(status)
-    );
-    collab.provider.awareness.on("change", handleAwarenessChange);
-    collab.doc.on("update", handleDocUpdate);
+    collab.text.observe(syncText);
+    collab.awareness.on("change", syncPresence);
+    collab.provider.on("open", handleOpen);
+    collab.provider.on("disconnect", handleDisconnect);
+    collab.provider.on("close", handleClose);
 
-    handleAwarenessChange();
+    syncPresence();
+    syncText();
 
     return () => {
-      collab.doc.off("update", handleDocUpdate);
-      collab.provider.awareness.off("change", handleAwarenessChange);
+      collab.text.unobserve(syncText);
+      collab.awareness.off("change", syncPresence);
+      collab.provider.off("open", handleOpen);
+      collab.provider.off("disconnect", handleDisconnect);
+      collab.provider.off("close", handleClose);
       bindingRef.current?.destroy();
       bindingRef.current = null;
       collab.destroy();
       collabRef.current = null;
+      setPresenceUsers([]);
+      setCollabStatus("disconnected");
     };
-  }, [room, projectId, accessToken, user]);
+  }, [room, accessToken, user, setLiveSourceCode]);
 
-  const handleEditorDidMount: OnMount = (editor) => {
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current !== null) {
+        window.clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleEditorMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
 
     const collab = collabRef.current;
-    if (!collab) {
-      editor.setValue(currentCode || room?.document.plain_text || "");
-      return;
-    }
-
     const model = editor.getModel();
-    if (!model) {
+
+    if (!collab || !model) {
       return;
     }
 
@@ -307,50 +311,75 @@ export default function ProjectPage() {
       collab.text,
       model,
       new Set([editor]),
-      collab.provider.awareness
+      collab.awareness
     );
 
-    const initial = collab.text.toString() || room?.document.plain_text || "";
-    suppressEditorChangeRef.current = true;
-    editor.setValue(initial);
-    suppressEditorChangeRef.current = false;
-    setCurrentCode(initial);
-
     editor.onDidChangeModelContent(() => {
-      if (suppressEditorChangeRef.current) {
-        return;
-      }
-      setCurrentCode(editor.getValue());
-      setSaveStatus("unsaved");
-      setSaveError(null);
+      const nextValue = editor.getValue();
+      setLiveSourceCode(nextValue);
+      scheduleAutosave();
     });
+
+    monaco.editor.setModelLanguage(model, selectedLanguage);
   };
 
-  const handleRun = async () => {
-    if (!projectId || !room) {
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) {
+      return;
+    }
+    const model = editor.getModel();
+    if (!model) {
+      return;
+    }
+    editor.updateOptions({ readOnly: room?.current_user_role === "viewer" });
+  }, [room?.current_user_role]);
+
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) {
       return;
     }
 
-    const code = syncCodeFromEditor();
+    const model = editor.getModel();
+    if (!model) {
+      return;
+    }
 
-    setRunError(null);
+    Monaco.editor.setModelLanguage(model, selectedLanguage);
+  }, [selectedLanguage]);
+
+  const handleRun = async () => {
+    if (!projectId) {
+      return;
+    }
+
     setIsRunning(true);
+    setRunError(null);
 
     try {
-      if (canEdit) {
-        await saveDocument(code);
+      if (saveStatus === "unsaved" || saveStatus === "saving") {
+        await flushSave();
       }
 
+      const liveCode = getLiveSourceCode();
+
       const run = await executionService.run(projectId, {
+        source_code: liveCode,
         language: selectedLanguage,
-        source_code: code,
       });
 
       setRuns((prev) => [run, ...prev.filter((item) => item.id !== run.id)]);
-      setOutputCollapsed(false);
+
+      const [runData, activityData] = await Promise.all([
+        executionService.list(projectId),
+        activityService.list(projectId),
+      ]);
+
+      setRuns(runData);
+      setActivities(activityData);
     } catch (error) {
-      setRunError(extractErrorMessage(error, "Failed to run code."));
-      setOutputCollapsed(false);
+      setRunError(extractErrorMessage(error, "Unable to run project code."));
     } finally {
       setIsRunning(false);
     }
@@ -361,254 +390,231 @@ export default function ProjectPage() {
       return;
     }
 
-    if (reviewInFlightRef.current || isReviewing || cooldownSeconds > 0) {
-      return;
-    }
-
-    reviewInFlightRef.current = true;
     setIsReviewing(true);
     setReviewError(null);
-    setReviewStatusText("Requesting live AI review...");
-
-    const code = syncCodeFromEditor();
+    setReviewStatusText("AI review in progress…");
 
     try {
-      if (canEdit) {
-        await saveDocument(code);
-      }
+      const liveCode = getLiveSourceCode();
 
       const review = await reviewService.review(projectId, {
+        source_code: liveCode,
         language: selectedLanguage,
-        source_code: code,
         collaboration_context: {
+          projectName: room.project.name,
           activeCollaborators: presenceUsers.length,
-          collabStatus,
         },
       });
 
       setLatestReview(review);
 
-      if (review.fallback_used) {
-        setReviewStatusText("Live provider hit a limit or failed. Fallback review was saved.");
-        setReviewCooldownUntil(Date.now() + 15000);
-      } else {
-        setReviewStatusText(`Live AI review completed via ${review.provider}.`);
-        setReviewCooldownUntil(Date.now() + 5000);
-      }
+      const [activityData] = await Promise.all([activityService.list(projectId)]);
+      setActivities(activityData);
+      setReviewStatusText(review.fallback_used ? "Fallback review completed." : "AI review completed.");
     } catch (error) {
-      const message = extractErrorMessage(error, "Failed to review code.");
-      setReviewError(message);
-
-      if (message.includes("429") || message.toLowerCase().includes("too many requests")) {
-        setReviewCooldownUntil(Date.now() + 20000);
-        setReviewStatusText("Provider rate limited the request. Cooling down before next attempt.");
-      } else {
-        setReviewCooldownUntil(Date.now() + 8000);
-        setReviewStatusText("Review request failed. Brief cooldown started.");
-      }
+      setReviewError(extractErrorMessage(error, "Unable to run AI review."));
+      setReviewStatusText(null);
     } finally {
-      reviewInFlightRef.current = false;
       setIsReviewing(false);
     }
   };
 
+  const handleAddMember = async (payload: { email: string; role: "editor" | "viewer" }) => {
+    if (!projectId || !room) {
+      return;
+    }
+
+    const updatedProject = await projectService.addMember(projectId, payload);
+    setRoom((current) =>
+      current
+        ? {
+            ...current,
+            project: updatedProject,
+          }
+        : current
+    );
+
+    const [activityData] = await Promise.all([activityService.list(projectId)]);
+    setActivities(activityData);
+  };
+
+  const handleUpdateMemberRole = async (userId: string, role: "editor" | "viewer") => {
+    if (!projectId || !room) {
+      return;
+    }
+
+    const updatedProject = await projectService.updateMemberRole(projectId, userId, { role });
+    setRoom((current) =>
+      current
+        ? {
+            ...current,
+            project: updatedProject,
+          }
+        : current
+    );
+
+    const [activityData] = await Promise.all([activityService.list(projectId)]);
+    setActivities(activityData);
+  };
+
+  const handleRemoveMember = async (userId: string) => {
+    if (!projectId) {
+      return;
+    }
+
+    await projectService.removeMember(projectId, userId);
+    await refreshProjectMeta();
+
+    const [activityData] = await Promise.all([activityService.list(projectId)]);
+    setActivities(activityData);
+  };
+
   if (isLoading) {
-    return <div className="p-6 text-slate-300">Loading project…</div>;
+    return (
+      <div className="flex min-h-[70vh] items-center justify-center text-slate-300">
+        <div className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-900/70 px-5 py-4">
+          <Loader2 className="animate-spin" size={18} />
+          Loading workspace…
+        </div>
+      </div>
+    );
   }
 
-  if (loadError || !room) {
-    return <div className="p-6 text-rose-300">{loadError ?? "Project not found."}</div>;
+  if (pageError || !room) {
+    return (
+      <div className="space-y-4">
+        <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white">
+          <ArrowLeft size={16} />
+          Back to dashboard
+        </Link>
+
+        <div className="rounded-[28px] border border-rose-400/20 bg-rose-500/10 p-6 text-rose-200">
+          {pageError ?? "Project data is unavailable."}
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-950 text-slate-100">
-      <header className="border-b border-white/10 bg-slate-950/90 px-6 py-4 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-[1800px] items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Link
-              to="/dashboard"
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10"
-            >
-              <ArrowLeft size={16} />
-              Back
-            </Link>
+    <div className="space-y-6">
+      <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white">
+        <ArrowLeft size={16} />
+        Back to dashboard
+      </Link>
 
-            <div>
-              <div className="text-lg font-semibold text-white">{room.project.name}</div>
-              <div className="text-sm text-slate-400">
-                {room.project.description || "Collaborative coding workspace"}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm">
-              {collabStatus === "connected" ? (
-                <>
-                  <Wifi size={16} className="text-emerald-300" />
-                  <span className="text-emerald-200">Connected</span>
-                </>
-              ) : (
-                <>
-                  <WifiOff size={16} className="text-amber-300" />
-                  <span className="text-amber-200">{collabStatus}</span>
-                </>
-              )}
-            </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm">
-              {saveStatus === "saved" && <span className="text-emerald-200">Saved</span>}
-              {saveStatus === "unsaved" && <span className="text-amber-200">Unsaved changes</span>}
-              {saveStatus === "saving" && <span className="text-sky-200">Saving…</span>}
-            </div>
-
-            {canEdit && (
-              <>
-                <button
-                  type="button"
-                  onClick={handleRun}
-                  disabled={isRunning || saveStatus === "saving"}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  {isRunning ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} />}
-                  Run code
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => void saveDocument()}
-                  disabled={saveStatus === "saving" || isRunning}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-indigo-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  {saveStatus === "saving" ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                  Save
-                </button>
-              </>
-            )}
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-white/10 bg-slate-900/80 px-5 py-4 shadow-soft">
+        <div>
+          <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Workspace</div>
+          <h1 className="mt-1 text-2xl font-semibold text-white">{room.project.name}</h1>
         </div>
 
-        {(saveError || runError) && (
-          <div className="mx-auto mt-3 flex w-full max-w-[1800px] flex-col gap-2">
-            {saveError && (
-              <div className="rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
-                {saveError}
-              </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-300">
+            {collabStatus === "connected" ? (
+              <Wifi size={16} className="text-emerald-300" />
+            ) : (
+              <WifiOff size={16} className="text-amber-300" />
             )}
-            {runError && (
-              <div className="rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
-                {runError}
-              </div>
-            )}
+            {collabStatus}
           </div>
-        )}
-      </header>
 
-      <div className="mx-auto flex w-full max-w-[1800px] flex-1 gap-4 p-4">
-        <aside className="flex h-[calc(100vh-112px)] w-[360px] shrink-0 flex-col gap-4 overflow-y-auto pr-1">
+          <div className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-300">
+            <Save size={16} className="text-indigo-300" />
+            {saveStatus}
+          </div>
+        </div>
+      </div>
+
+      {saveError ? (
+        <div className="rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+          {saveError}
+        </div>
+      ) : null}
+
+      <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
+        <div className="space-y-6 xl:sticky xl:top-6 xl:self-start">
           <ProjectSidebar
             project={room.project}
+            currentUserRole={room.current_user_role}
             selectedLanguage={selectedLanguage}
             onLanguageChange={setSelectedLanguage}
-            currentUserRole={room.current_user_role}
+            onAddMember={handleAddMember}
+            onUpdateMemberRole={handleUpdateMemberRole}
+            onRemoveMember={handleRemoveMember}
+            isSaving={saveStatus === "saving"}
           />
 
-          <RunPanel
-            runs={runs}
-            isRunning={isRunning}
-            error={null}
-            onRun={handleRun}
-          />
-
+          <ActivityLogPanel events={activities} />
+          <LeaderboardPanel entries={leaderboard} />
           <AIReviewPanel
             review={latestReview}
             isLoading={isReviewing}
             error={reviewError}
             onReview={handleReview}
             statusText={reviewStatusText}
-            cooldownSeconds={cooldownSeconds}
           />
+        </div>
 
-          <MemberPresence users={presenceUsers} />
-          <ActivityLogPanel events={activities} />
-          <LeaderboardPanel entries={leaderboard} />
-        </aside>
-
-        <section className="flex min-w-0 flex-1 flex-col gap-4">
-          <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[28px] border border-white/10 bg-slate-900/80 shadow-soft">
-            <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
-              <div className="text-sm font-medium text-slate-300">
-                {selectedLanguage === "python" ? "main.py" : "main.js"}
+        <div className="space-y-6">
+          <section className="rounded-[28px] border border-white/10 bg-slate-900/80 p-5 shadow-soft">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="text-base font-semibold text-white">Editor</h2>
+                <p className="mt-1 text-sm text-slate-400">
+                  Code editor is primary on the right. Tools and collaboration menus stay on the left.
+                </p>
               </div>
-              <div className="text-xs text-slate-500">
-                Last synced:{" "}
-                {room.document.last_synced_at ? new Date(room.document.last_synced_at).toLocaleString() : "—"}
+
+              <div className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/80 px-3 py-2 text-sm text-slate-300">
+                <Sparkles size={15} className="text-violet-300" />
+                {room.current_user_role === "viewer" ? "Read only" : "Editable"}
               </div>
             </div>
 
-            <div className="min-h-0 flex-1">
+            <div className="overflow-hidden rounded-2xl border border-white/10 bg-slate-950">
               <Editor
-                height="100%"
-                theme="vs-dark"
-                defaultLanguage={selectedLanguage}
+                height="70vh"
                 language={selectedLanguage}
-                defaultValue={currentCode}
-                onMount={handleEditorDidMount}
+                theme="vs-dark"
+                value={sourceCode}
+                onMount={handleEditorMount}
+                onChange={(value) => {
+                  const nextValue = value ?? "";
+                  setLiveSourceCode(nextValue);
+                  scheduleAutosave();
+                }}
                 options={{
                   minimap: { enabled: false },
                   fontSize: 14,
                   automaticLayout: true,
-                  roundedSelection: true,
+                  wordWrap: "on",
                   scrollBeyondLastLine: false,
-                  padding: { top: 16 },
-                  readOnly: !canEdit,
                 }}
               />
             </div>
           </section>
 
-          <section
-            className={`overflow-hidden rounded-[28px] border border-white/10 bg-slate-900/80 shadow-soft ${
-              outputCollapsed ? "h-[64px]" : "h-[250px]"
-            }`}
-          >
-            <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
-              <div className="flex items-center gap-2">
-                <TerminalSquare size={16} className="text-indigo-300" />
-                <div>
-                  <div className="text-sm font-semibold text-white">Output</div>
-                  <div className="text-xs text-slate-400">{outputTitle(latestRun)}</div>
-                </div>
+          <div className="grid gap-6 2xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <RunPanel
+              runs={runs}
+              isRunning={isRunning}
+              language={selectedLanguage}
+              error={runError}
+              onRun={handleRun}
+            />
+
+            <section className="rounded-[28px] border border-white/10 bg-slate-900/80 p-5 shadow-soft">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-base font-semibold text-white">Execution output</h3>
+                <div className="text-xs text-slate-400">{outputTitle(latestRun)}</div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setOutputCollapsed((prev) => !prev)}
-                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300 hover:bg-white/10"
-              >
-                {outputCollapsed ? (
-                  <>
-                    <ChevronUp size={14} />
-                    Expand
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown size={14} />
-                    Collapse
-                  </>
-                )}
-              </button>
-            </div>
-
-            {!outputCollapsed && (
-              <div className="h-[calc(250px-57px)] overflow-auto bg-slate-950/90 p-0">
-                <pre className="min-h-full whitespace-pre-wrap break-words px-5 py-4 font-mono text-sm leading-6 text-slate-200">
-                  {outputText(latestRun)}
-                </pre>
-              </div>
-            )}
-          </section>
-        </section>
+              <pre className="mt-4 min-h-[320px] overflow-auto whitespace-pre-wrap rounded-2xl border border-white/10 bg-black/40 px-4 py-4 text-sm leading-6 text-slate-100">
+                {outputText(latestRun)}
+              </pre>
+            </section>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -49,7 +49,6 @@ const server = new Server({
     new Redis({
       host: redisUrl.hostname,
       port: Number(redisUrl.port || "6379"),
-      password: redisUrl.password || undefined,
     }),
     new Database({
       fetch: async ({ documentName }: { documentName: string }) => {
@@ -82,46 +81,26 @@ const server = new Server({
     });
   },
 
-  async onAwarenessUpdate(data: any) {
-    logger.info("collab.awareness_update", {
-      projectId: data.documentName,
-      added: data.added?.length ?? 0,
-      updated: data.updated?.length ?? 0,
-      removed: data.removed?.length ?? 0,
-      clientsCount: data.clientsCount ?? 0,
-    });
-  },
-
-  async onChange(data: any) {
-    schedulePlainTextSync(data.documentName, data.document, data.context?.userId);
-  },
-
   async onDisconnect(data: any) {
     logger.info("collab.disconnected", {
       projectId: data.documentName,
       socketId: data.socketId,
-      userId: data.context?.userId ?? null,
     });
   },
 
   async onStoreDocument(data: any) {
-    logger.info("collab.document_stored", {
-      projectId: data.documentName,
-      clientsCount: data.clientsCount ?? 0,
-    });
-  },
-
-  async onListen(data: any) {
-    logger.info("collab.listening", {
-      port: data.port,
-      serverName: config.serverName,
-    });
+    const userId =
+      typeof data?.context?.userId === "string" ? data.context.userId : undefined;
+    schedulePlainTextSync(data.documentName, data.document, userId);
   },
 
   async onDestroy() {
     await closeDb();
-    logger.info("collab.destroyed");
   },
 });
 
 server.listen();
+logger.info("collab.server_started", {
+  port: config.port,
+  serverName: config.serverName,
+});

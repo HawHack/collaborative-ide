@@ -11,6 +11,8 @@ from app.schemas.project import (
     ProjectDocumentUpdateRequest,
     ProjectDocumentUpdateResponse,
     ProjectListItem,
+    ProjectMemberInviteRequest,
+    ProjectMemberRoleUpdateRequest,
     ProjectRead,
     ProjectRoomInfo,
     ProjectUpdateRequest,
@@ -61,20 +63,6 @@ async def get_project_room(
     return await ProjectService(session).get_room_info(project_id=project_id, user=current_user)
 
 
-@router.put("/{project_id}/document", response_model=ProjectDocumentUpdateResponse)
-async def save_project_document(
-    project_id: str,
-    payload: ProjectDocumentUpdateRequest,
-    session: AsyncSession = Depends(db_session),
-    current_user: User = Depends(get_current_user),
-) -> ProjectDocumentUpdateResponse:
-    return await ProjectService(session).save_document(
-        project_id=project_id,
-        user=current_user,
-        plain_text=payload.plain_text,
-    )
-
-
 @router.patch("/{project_id}", response_model=ProjectRead)
 async def update_project(
     project_id: str,
@@ -89,6 +77,66 @@ async def update_project(
         description=payload.description,
         language=payload.language,
     )
+
+
+@router.put("/{project_id}/document", response_model=ProjectDocumentUpdateResponse)
+async def update_project_document(
+    project_id: str,
+    payload: ProjectDocumentUpdateRequest,
+    session: AsyncSession = Depends(db_session),
+    current_user: User = Depends(get_current_user),
+) -> ProjectDocumentUpdateResponse:
+    return await ProjectService(session).save_document(
+        project_id=project_id,
+        user=current_user,
+        plain_text=payload.plain_text,
+    )
+
+
+@router.post("/{project_id}/members", response_model=ProjectRead, status_code=status.HTTP_201_CREATED)
+async def add_project_member(
+    project_id: str,
+    payload: ProjectMemberInviteRequest,
+    session: AsyncSession = Depends(db_session),
+    current_user: User = Depends(get_current_user),
+) -> ProjectRead:
+    return await ProjectService(session).add_member(
+        project_id=project_id,
+        user=current_user,
+        email=payload.email,
+        role=payload.role,
+    )
+
+
+@router.patch("/{project_id}/members/{member_user_id}", response_model=ProjectRead)
+async def update_project_member_role(
+    project_id: str,
+    member_user_id: str,
+    payload: ProjectMemberRoleUpdateRequest,
+    session: AsyncSession = Depends(db_session),
+    current_user: User = Depends(get_current_user),
+) -> ProjectRead:
+    return await ProjectService(session).update_member_role(
+        project_id=project_id,
+        user=current_user,
+        member_user_id=member_user_id,
+        role=payload.role,
+    )
+
+
+@router.delete("/{project_id}/members/{member_user_id}", response_model=MessageResponse)
+async def remove_project_member(
+    project_id: str,
+    member_user_id: str,
+    session: AsyncSession = Depends(db_session),
+    current_user: User = Depends(get_current_user),
+) -> MessageResponse:
+    await ProjectService(session).remove_member(
+        project_id=project_id,
+        user=current_user,
+        member_user_id=member_user_id,
+    )
+    return MessageResponse(message="Member removed successfully.")
 
 
 @router.delete("/{project_id}", response_model=MessageResponse)

@@ -10,8 +10,8 @@ type ProjectCardProps = {
 
 function languageBadge(language: ProjectListItem["language"]) {
   return language === "python"
-    ? "bg-emerald-500/15 text-emerald-300 border-emerald-400/20"
-    : "bg-amber-500/15 text-amber-300 border-amber-400/20";
+    ? "border-emerald-400/20 bg-emerald-500/15 text-emerald-300"
+    : "border-amber-400/20 bg-amber-500/15 text-amber-300";
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
@@ -34,6 +34,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           </div>
 
           <h3 className="truncate text-xl font-semibold text-white">{project.name}</h3>
+
           <p className="mt-2 line-clamp-3 min-h-[3.75rem] text-sm leading-6 text-slate-400">
             {project.description || "No project description yet."}
           </p>
