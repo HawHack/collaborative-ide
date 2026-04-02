@@ -3,15 +3,22 @@
   "files": [
     {
       "path": ".env",
-      "size_bytes": 1293,
-      "sha256": "537e18bf7f05190ab69b6b48a83b8d12279e55d0cbc3a4fa69d675c0d2cf3c70",
+      "size_bytes": 1295,
+      "sha256": "ac10c15e765a9040c01ae9afefb31e5492496c7260dee520769bc786f84d6d6c",
       "type": "text",
       "encoding": "utf-8"
     },
     {
       "path": ".gitignore",
-      "size_bytes": 322,
-      "sha256": "8b3a9a53d802dbef5346186047ea8d1d7f550b9da8c78f54c5d115a81a87b628",
+      "size_bytes": 357,
+      "sha256": "b57ce997d2d5f84dd16f2fed4d02acab94f2de7aa1b297c4f27b8960d35474a1",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "backend/.dockerignore",
+      "size_bytes": 149,
+      "sha256": "c2bc5abd6a149984a834ebbcc4c97668d6fce2d4430a8d22503e7389b4908c04",
       "type": "text",
       "encoding": "utf-8"
     },
@@ -101,8 +108,8 @@
     },
     {
       "path": "backend/app/api/v1/endpoints/projects.py",
-      "size_bytes": 3507,
-      "sha256": "73935d458b2d31f8232f3b43bc88f25e51de30116e30fab490b0df17d0d5c33e",
+      "size_bytes": 5153,
+      "sha256": "f60114876b6ffd3d1ff9ec3b4711bf6c220053461233447708b25c64fd127315",
       "type": "text",
       "encoding": "utf-8"
     },
@@ -262,8 +269,8 @@
     },
     {
       "path": "backend/app/repositories/project_repository.py",
-      "size_bytes": 3269,
-      "sha256": "d04a6dd0bde218590ce73733b2684086c89b28e97ebb54235f5dae107b480c9a",
+      "size_bytes": 4308,
+      "sha256": "36634a073bd81b5f6b9ad548ea8056c00e3017d5737084975046f04346e89c98",
       "type": "text",
       "encoding": "utf-8"
     },
@@ -332,8 +339,8 @@
     },
     {
       "path": "backend/app/schemas/project.py",
-      "size_bytes": 1900,
-      "sha256": "49d4b77937c39496ff2b85dc22dd2ea9a4e64a88b671ca2770b5c3c3eb03e28a",
+      "size_bytes": 2128,
+      "sha256": "df44e662848ea9501f88f686bc86f2e5c2b2b8589f478fa6ba6e110e5a6b0b29",
       "type": "text",
       "encoding": "utf-8"
     },
@@ -381,8 +388,8 @@
     },
     {
       "path": "backend/app/services/project_service.py",
-      "size_bytes": 10185,
-      "sha256": "294861cc7741080277dac69d5cbd4bbc1498064f0c3933ee8ffc9bf9a8d2a96b",
+      "size_bytes": 13938,
+      "sha256": "cb7413b82490c0292bd36f57261614b037d15db4aeedcb45c9447caec0ea8ee7",
       "type": "text",
       "encoding": "utf-8"
     },
@@ -415,9 +422,16 @@
       "encoding": "utf-8"
     },
     {
+      "path": "backend/docker/entrypoint.sh",
+      "size_bytes": 670,
+      "sha256": "2326b2e85600118bb760a988574f0f390a0dabf24a1c1678fdc67f6f997f209a",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
       "path": "backend/Dockerfile",
-      "size_bytes": 374,
-      "sha256": "0361129230ce8917d69ff90eb5bd4ad2acfa6b22d0aa82a4386e0c8f0a2268ad",
+      "size_bytes": 534,
+      "sha256": "62d719420060d155af2888b3dd7d98a8555d0bbb2f5fc494d9877fd845382607",
       "type": "text",
       "encoding": "utf-8"
     },
@@ -425,6 +439,13 @@
       "path": "backend/requirements.txt",
       "size_bytes": 346,
       "sha256": "055202170f9b8d10506b8ef3c69423c8771a99882a3b38294c92743f1790acbc",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "collab/.dockerignore",
+      "size_bytes": 132,
+      "sha256": "6a9bfe6885f98306b33927078edcae458ff5c484e02ab4557695c60b9fe87640",
       "type": "text",
       "encoding": "utf-8"
     },
@@ -493,8 +514,8 @@
     },
     {
       "path": "docker-compose.yml",
-      "size_bytes": 4474,
-      "sha256": "b752013f1e6025c94783772676ba0d5abd39841754b6f3dd46df05ff2d07caee",
+      "size_bytes": 4664,
+      "sha256": "06b3d249fdd37476af3d848469e441d8658fc2f3d916a250b2ada89a35a6f68e",
       "type": "text",
       "encoding": "utf-8"
     },
@@ -502,6 +523,13 @@
       "path": "dump_project.py",
       "size_bytes": 8737,
       "sha256": "92998a34c88a679fb03b062e7de1984faf8d82f56e8edac4de4ee2cb6aa92ca0",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "executor/.dockerignore",
+      "size_bytes": 133,
+      "sha256": "4c4c7a3c39d9517d5715dcb8fc78c4a6c5304a08d56bd32fd90f6f7ca6a88537",
       "type": "text",
       "encoding": "utf-8"
     },
@@ -548,9 +576,23 @@
       "encoding": "utf-8"
     },
     {
+      "path": "frontend/.dockerignore",
+      "size_bytes": 132,
+      "sha256": "6a9bfe6885f98306b33927078edcae458ff5c484e02ab4557695c60b9fe87640",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
       "path": "frontend/Dockerfile",
-      "size_bytes": 244,
-      "sha256": "3b8b2c2cb6b9dc250d0e3683d362dff43719047c8239dd79891375b599cecf78",
+      "size_bytes": 214,
+      "sha256": "bd00447f75274cfe491fd6f360938f33bfbe0d237400b7391044a0d54006ec87",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "frontend/frontend.nginx.conf",
+      "size_bytes": 161,
+      "sha256": "b9440b33c1331139bd632b6d67af015d878f04bd018c86842eadd3d5e6808fc1",
       "type": "text",
       "encoding": "utf-8"
     },
@@ -633,8 +675,8 @@
     },
     {
       "path": "frontend/src/components/ProjectSidebar.tsx",
-      "size_bytes": 9446,
-      "sha256": "fb11691c7e4b3e3fac4af2d12c1d05c1c0dd1dd89b9e20572f99ae40a0572277",
+      "size_bytes": 11777,
+      "sha256": "4cbf2756113443acd6bae7ae79c0c2310ae1bff22c732f9135db8d6899810691",
       "type": "text",
       "encoding": "utf-8"
     },
@@ -647,8 +689,8 @@
     },
     {
       "path": "frontend/src/components/RunPanel.tsx",
-      "size_bytes": 4228,
-      "sha256": "cff802ef83d912e55502497e250ec66294bdf779491e3055ecc02b356509ee2e",
+      "size_bytes": 4536,
+      "sha256": "0f2102c5e74753af100ebef74bccd0d5e576246750b92b27a878cc261dc355ca",
       "type": "text",
       "encoding": "utf-8"
     },
@@ -745,8 +787,8 @@
     },
     {
       "path": "frontend/src/pages/ProjectPage.tsx",
-      "size_bytes": 24137,
-      "sha256": "aeea33b48a32357b60383c933971abde5f24f55e4feb2c82af618584d85f27ee",
+      "size_bytes": 19670,
+      "sha256": "0643ad1d88bbcbe88b9538e78ef8436c0ac75ee4d0d384ec6779a36ecead58e3",
       "type": "text",
       "encoding": "utf-8"
     },
@@ -780,8 +822,8 @@
     },
     {
       "path": "frontend/src/services/projectService.ts",
-      "size_bytes": 1080,
-      "sha256": "5ffaf0adfd83bfab853b8ea12c5fce0147d5e79dccbc4646e90beedccf673e40",
+      "size_bytes": 1879,
+      "sha256": "a47e67849907bb8a8ea94a6d9a452ca8f48bf00da8bf3e082cb2bd82dff08fc2",
       "type": "text",
       "encoding": "utf-8"
     },
@@ -801,8 +843,8 @@
     },
     {
       "path": "frontend/src/types/api.ts",
-      "size_bytes": 3340,
-      "sha256": "d6158ed5b683ee2285e88981c5a6dafcf0900c0ba988517233229fca0945a634",
+      "size_bytes": 3261,
+      "sha256": "23b873574ed3040dfafc6172df6abe53c3a3f29b0c3294d1c35b37a89cb05f64",
       "type": "text",
       "encoding": "utf-8"
     },
@@ -843,29 +885,50 @@
     },
     {
       "path": "package-lock.json",
-      "size_bytes": 923,
-      "sha256": "fbbba1af6ba320b4ca4ee37d0a42d69df770b3b432200c80fa60e1003f057f0e",
+      "size_bytes": 954,
+      "sha256": "2cec5b40a5a0cf46c53d16e85b9a894488ed6fc2f8051662ca741a2556500f9f",
       "type": "text",
       "encoding": "utf-8"
     },
     {
       "path": "package.json",
-      "size_bytes": 57,
-      "sha256": "6cf25bd9069b575f94701d1e8c324a847c05c4df8754aae4fd6cc2f8cf225f33",
+      "size_bytes": 62,
+      "sha256": "9aa0ec133beb61ce21f96a6614461ff96439321e25246d90d150f16ad005adc5",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "project_dump.txt",
+      "size_bytes": 408933,
+      "sha256": "72dc14de4346ffb35ffd1bee11d776d9b8cdbb98e0531e77f682b91a47902a47",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "project_manifest.json",
+      "size_bytes": 27975,
+      "sha256": "a81fc73340872bbb7fd8227ba1b9d731c910ef1067d916f28c232f59ff17ab9b",
       "type": "text",
       "encoding": "utf-8"
     },
     {
       "path": "README.md",
-      "size_bytes": 10842,
-      "sha256": "973cd300a417be5987582e41959600336364c05d19cbf272da0659ef26fc71af",
+      "size_bytes": 3404,
+      "sha256": "a05ddacca6774170a7389bdd64962bbae4d259016b06ad13006fac32c9db35fd",
+      "type": "text",
+      "encoding": "utf-8"
+    },
+    {
+      "path": "validation-report.json",
+      "size_bytes": 1593,
+      "sha256": "a46ef2fa8e46a0488e3aa3350ed0f67efde3fe296c4fa02554c3d2ebbaef522f",
       "type": "text",
       "encoding": "utf-8"
     }
   ],
   "stats": {
-    "total_files": 123,
-    "text_files": 123,
+    "total_files": 132,
+    "text_files": 132,
     "binary_files": 0,
     "unreadable_files": 0
   }
